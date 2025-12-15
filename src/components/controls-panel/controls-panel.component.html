@@ -1,0 +1,91 @@
+
+<div class="flex flex-col h-full">
+  <!-- File Upload Section -->
+  <div class="p-4 border-b border-zinc-700">
+    <h2 class="text-lg font-semibold mb-2 text-gray-100">Project Media</h2>
+    <div class="bg-zinc-700 p-3 rounded-md flex items-center gap-3">
+      <svg class="w-6 h-6 text-sky-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9A2.25 2.25 0 0 0 13.5 5.25h-9A2.25 2.25 0 0 0 2.25 7.5v9A2.25 2.25 0 0 0 4.5 18.75Z" /></svg>
+      <span class="text-sm text-gray-300 truncate" [title]="videoFileName()">{{ videoFileName() }}</span>
+    </div>
+    <label class="w-full mt-3 inline-block text-center text-sm font-semibold bg-sky-600 text-white py-2 px-4 rounded-md hover:bg-sky-500 transition-colors cursor-pointer">
+      Import Media
+      <input type="file" class="hidden" (change)="onFileChange($event)" accept="video/*" />
+    </label>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="flex border-b border-zinc-700">
+    <button (click)="activeTab.set('presets')" [class]="activeTab() === 'presets' ? 'border-sky-400 text-sky-400' : 'border-transparent text-gray-400'" class="flex-1 py-3 px-2 text-sm font-medium border-b-2 hover:bg-zinc-700/50 transition-colors">Presets</button>
+    <button (click)="activeTab.set('adjust')" [class]="activeTab() === 'adjust' ? 'border-sky-400 text-sky-400' : 'border-transparent text-gray-400'" class="flex-1 py-3 px-2 text-sm font-medium border-b-2 hover:bg-zinc-700/50 transition-colors">Adjust</button>
+    <button (click)="activeTab.set('ai')" [class]="activeTab() === 'ai' ? 'border-sky-400 text-sky-400' : 'border-transparent text-gray-400'" class="flex-1 py-3 px-2 text-sm font-medium border-b-2 hover:bg-zinc-700/50 transition-colors">AI Magic</button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="flex-1 overflow-y-auto p-4">
+    <!-- Presets -->
+    @if (activeTab() === 'presets') {
+      <div class="grid grid-cols-2 gap-3">
+        @for (preset of presets; track preset.name) {
+          <button (click)="selectPreset(preset.filter)" class="aspect-video bg-zinc-700 rounded-md hover:ring-2 hover:ring-sky-500 transition-all flex items-end p-2 text-left">
+            <span class="text-xs font-semibold text-gray-200">{{ preset.name }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Adjustments -->
+    @if (activeTab() === 'adjust') {
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Brightness: {{ brightness() }}%</label>
+          <input type="range" min="0" max="200" [ngModel]="brightness()" (ngModelChange)="brightness.set($event)" class="w-full h-2 bg-zinc-600 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Contrast: {{ contrast() }}%</label>
+          <input type="range" min="0" max="200" [ngModel]="contrast()" (ngModelChange)="contrast.set($event)" class="w-full h-2 bg-zinc-600 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Saturation: {{ saturation() }}%</label>
+          <input type="range" min="0" max="200" [ngModel]="saturation()" (ngModelChange)="saturation.set($event)" class="w-full h-2 bg-zinc-600 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Sepia: {{ sepia() }}%</label>
+          <input type="range" min="0" max="100" [ngModel]="sepia()" (ngModelChange)="sepia.set($event)" class="w-full h-2 bg-zinc-600 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Hue: {{ hue() }}°</label>
+          <input type="range" min="-180" max="180" [ngModel]="hue()" (ngModelChange)="hue.set($event)" class="w-full h-2 bg-zinc-600 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <button (click)="resetAdjustments()" class="w-full mt-4 text-sm font-semibold bg-zinc-600 text-white py-2 px-4 rounded-md hover:bg-zinc-500 transition-colors">Reset</button>
+      </div>
+    }
+
+    <!-- AI Generator -->
+    @if (activeTab() === 'ai') {
+      <div class="flex flex-col gap-4">
+        <p class="text-sm text-gray-400">Describe the look you want, e.g., "A moody, rainy day in Tokyo" or "Warm, nostalgic summer evening".</p>
+        <textarea [(ngModel)]="aiPrompt" rows="4" class="w-full bg-zinc-700 border border-zinc-600 rounded-md p-2 text-sm text-gray-200 focus:ring-sky-500 focus:border-sky-500" placeholder="Describe a visual style..."></textarea>
+        <button (click)="generateWithAi()" [disabled]="isLoadingAi() || !aiPrompt().trim()" class="w-full text-sm font-semibold bg-violet-600 text-white py-2 px-4 rounded-md hover:bg-violet-500 transition-colors disabled:bg-zinc-500 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            @if (isLoadingAi()) {
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Generating...</span>
+            } @else {
+              <span>Generate with AI</span>
+            }
+        </button>
+        @if (aiError()) {
+          <p class="text-sm text-red-400">{{ aiError() }}</p>
+        }
+        @if (aiGeneratedFilter()) {
+          <div class="bg-zinc-700 p-3 rounded-md">
+            <p class="text-sm font-semibold text-gray-200">AI Generated Filter:</p>
+            <p class="text-xs text-gray-400 font-mono mt-1">{{ aiGeneratedFilter() }}</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

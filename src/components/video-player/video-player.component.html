@@ -1,0 +1,55 @@
+
+@if (videoSrc()) {
+  <div class="w-full h-full relative group flex items-center justify-center">
+    <video #videoPlayer [src]="videoSrc()" class="max-w-full max-h-full outline-none" (click)="togglePlay()" autoplay loop></video>
+
+    <!-- Center Play/Pause Button -->
+    <div 
+      (click)="togglePlay()"
+      [class]="!isPlaying() && showControls() ? 'opacity-100 scale-100' : 'opacity-0 scale-125'"
+      class="absolute transition-all duration-200 cursor-pointer">
+      <svg class="w-20 h-20 text-white/80" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+      </svg>
+    </div>
+
+    <!-- Controls Bar -->
+    <div [class]="showControls() ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full'" 
+         class="absolute bottom-0 left-0 right-0 bg-black/50 p-3 transition-all duration-300 ease-in-out">
+      
+      <!-- Progress Bar -->
+      <input type="range" 
+             [value]="currentTime()" 
+             [max]="duration()" 
+             (input)="onSeek($event)"
+             class="w-full h-1 mb-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-sky-500">
+
+      <!-- Bottom Controls -->
+      <div class="flex items-center justify-between text-white">
+        <div class="flex items-center gap-4">
+          <button (click)="togglePlay()">
+            @if(isPlaying()) {
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 0 0-.75.75v12c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-12a.75.75 0 0 0-.75-.75h-3ZM14.25 5.25a.75.75 0 0 0-.75.75v12c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-12a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd" />
+              </svg>
+            } @else {
+              <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.647c1.295.742 1.295 2.545 0 3.286L7.279 20.99c-1.25.717-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+              </svg>
+            }
+          </button>
+          <span class="text-sm font-mono">{{ formatTime(currentTime()) }} / {{ formatTime(duration()) }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+           @for(rate of playbackRates; track rate) {
+            <button (click)="setPlaybackRate(rate)" 
+                    [class]="playbackRate() === rate ? 'bg-sky-500' : 'bg-white/20'"
+                    class="px-2 py-0.5 rounded text-xs font-semibold transition-colors">
+              {{rate}}x
+            </button>
+           }
+        </div>
+      </div>
+    </div>
+  </div>
+}

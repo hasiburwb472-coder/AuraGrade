@@ -1,0 +1,51 @@
+
+<div class="h-full w-full flex flex-col p-2">
+  <!-- Timeline Controls -->
+  <div class="flex-shrink-0 flex items-center gap-4 px-2 pb-2 border-b border-zinc-700">
+    <button class="p-1 rounded-md hover:bg-zinc-600">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+    </button>
+    <button class="p-1 rounded-md hover:bg-zinc-600">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 2.841A1.5 1.5 0 0 0 4 4.11V15.89a1.5 1.5 0 0 0 2.3 1.269l9.344-5.89a1.5 1.5 0 0 0 0-2.538L6.3 2.84Z" /></svg>
+    </button>
+    <button class="p-1 rounded-md hover:bg-zinc-600">
+      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+    </button>
+    <div class="w-px h-6 bg-zinc-600 mx-2"></div>
+    <span class="text-sm font-mono text-gray-300">00:00:00:00</span>
+  </div>
+  
+  <!-- Tracks Area -->
+  <div class="flex-1 overflow-y-auto pt-2 relative">
+    @if (clips().length > 0) {
+      <!-- Video Track -->
+      <div class="flex items-center h-20 mb-1">
+        <div class="w-24 flex-shrink-0 text-xs text-right pr-2 text-gray-400">V1</div>
+        <div class="flex-1 bg-zinc-700/50 h-full rounded-md flex items-center px-1">
+          @for(clip of clips(); track clip.name) {
+            <div class="bg-sky-800 h-16 rounded flex items-center p-1" [style.width.%]="100">
+               <img [src]="clip.thumbnail" alt="thumbnail" class="w-16 h-full object-cover rounded-sm"/>
+               <div class="ml-2">
+                  <p class="text-xs font-semibold truncate">{{ clip.name }}</p>
+                  <p class="text-xs text-sky-200">{{ clip.duration.toFixed(2) }}s</p>
+               </div>
+            </div>
+          }
+        </div>
+      </div>
+      <!-- Audio Track -->
+      <div class="flex items-center h-20">
+        <div class="w-24 flex-shrink-0 text-xs text-right pr-2 text-gray-400">A1</div>
+        <div class="flex-1 bg-zinc-700/50 h-full rounded-md flex items-center px-1">
+          @for(clip of clips(); track clip.name) {
+            <div class="bg-emerald-800 h-16 rounded w-full flex items-center p-2">
+              <p class="text-xs text-emerald-200">Audio for {{ clip.name }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="text-center text-zinc-600 text-sm pt-8">Timeline is empty</div>
+    }
+  </div>
+</div>
